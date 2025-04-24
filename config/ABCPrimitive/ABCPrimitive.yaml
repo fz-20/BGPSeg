@@ -1,0 +1,57 @@
+DATA:
+  data_name: ABCPrimitive
+  data_root: data/ABCPrimitive # Fill in the data path (which contains the .npz files)
+  classes: 10
+  fea_dim: 6
+  train_loop: 4
+  val_loop: 0.02
+
+TRAIN:
+  #arch
+  arch: BGPSeg
+  sync_bn: True  # adopt sync_bn or not
+  k: 16
+  bandwidth: 1.31
+
+  # training
+  scheduler_update: epoch  # step or epoch 
+  scheduler: Cosine 
+  use_amp: True
+  optimizer: AdamW 
+  ignore_label: -100
+  train_gpu: [0]
+  workers: 8  # data loader workers
+  batch_size: 16  # batch size for training
+  batch_size_val: 1  # batch size for validation during training, memory and speed tradeoff
+  base_lr: 0.001
+  epochs: 200
+  start_epoch: 0
+  momentum: 0.9
+  weight_decay: 0.01
+  manual_seed: 123
+  print_freq: 1
+  save_freq: 1
+  save_path: exp/ABCPrimitive
+  weight:  # path to initial weight (default: none)
+  resume:  # path to latest checkpoint (default: none)
+  boundaryweight: checkpoints/Boundary_model.pth # path to boundary predictor checkpoint (default: none)
+  evaluate: True  # evaluate on validation set, extra gpu memory needed and small batch_size_val is recommend
+  eval_freq: 1
+  type_loss_weight: 1.0 # loss weight parameter alpha
+  cluster_bs: 700 # Cluster batchsize, the larger the GPU memory is required
+Distributed:
+  dist_url: tcp://127.0.0.1:6789
+  dist_backend: 'nccl'
+  multiprocessing_distributed: True
+  world_size: 1
+  rank: 0
+
+TEST:
+  split: test  # split in [train, val and test]
+  test_loop: 1
+  test_gpu: [0]
+  test_workers: 8
+  batch_size_test: 1
+  model_path: checkpoints/BGPSeg_model.pth # Fill the path of the BGPSeg trained .pth file model
+  boundary_model_path: checkpoints/Boundary_model.pth # Fill the path of the boundary predictor trained .pth file model
+
