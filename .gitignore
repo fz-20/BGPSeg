@@ -23,6 +23,5 @@ outputs/
 .vscode
 .DS_Store
 visual
-log*
 slurm*
 results
